@@ -1,6 +1,7 @@
 import numpy as np
 import controller
 import decorator
+import library
 
 
 class AbstractModel():
@@ -11,6 +12,7 @@ class AbstractModel():
         self._data = np.array([], dtype=np.float_)
         self._boundary = np.array([], dtype=np.bool_)
         self._A = np.array([], dtype=np.float_)
+        self._count_iteration = 0
 
     @property
     def _controller(self):
@@ -79,6 +81,39 @@ class AbstractModel():
         self.__initial = value
         self._data = self._initial.copy()
 
+    def forward(self):
+
+        while True:
+
+            self._stepForward()
+            self._count_iteration += 1
+
+            yield self._data
+
+    def _stepForward(self):
+        pass
+
+    def backward(self):
+
+        while True:
+
+            if self._count_iteration > 0:
+
+                self._stepBackward()
+                self._count_iteration -= 1
+
+                yield self._data
+
+            else:
+
+                yield self._data
+
+    def _stepBackward(self):
+        pass
+
+    def updateA(self):
+        pass
+
     def setInitialCondition(self, initial_condition=[], boundary_condition=[]):
 
         initial = np.array(initial_condition, dtype=np.float_)
@@ -110,15 +145,12 @@ class AbstractModel():
                     'Shape of boundary_condition does not match boundary_condition'
                 )
 
-    def iterate(self):
-        pass
-
-    def updateA(self, niter=1):
-        pass
-
 
 class LaplaceModel(AbstractModel):
     def __init__(self, controller):
+
+        self.max_history = 100
+        self._data_history = library.BufferQueue(maxsize=self.max_history)
 
         super().__init__(controller)
 
@@ -154,13 +186,15 @@ class LaplaceModel(AbstractModel):
                 self._A[idx, idx + shape[1] * shape[2]] = factor
                 self._A[idx, idx - shape[1] * shape[2]] = factor
 
-    @decorator.logThis(filename=None, timed=True)
-    def iterate(self, niter=1):
+    @decorator.logThis(filename=None)
+    def _stepForward(self):
 
-        data_aux = self._data.copy()
-        data_aux = data_aux.ravel()
+        self._data_history.put(self._data)
 
-        for iteration in range(niter):
-            data_aux = self._A.dot(data_aux)
-
+        data_aux = self._data.flatten()
+        data_aux = self._A.dot(data_aux)
         self._data = np.reshape(data_aux, self._data.shape)
+
+    def _stepBackward(self):
+
+        self._data = self._data_history.get()

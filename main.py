@@ -12,8 +12,8 @@ def main():
     view = HeatView(controller)
     model = LaplaceModel(controller)
 
-    controller.view = view
-    controller.model = model
+    controller._view = view
+    controller._model = model
 
     app.exec_()
 

@@ -1,5 +1,7 @@
 import model
 import view
+import numpy as np
+import time
 
 
 class AbstractController():
@@ -27,7 +29,7 @@ class AbstractController():
     @property
     def _view(self):
 
-        return self.__model
+        return self.__view
 
     @_view.setter
     def _view(self, value):
@@ -44,3 +46,27 @@ class AbstractController():
 class Controller(AbstractController):
     def __init__(self):
         super().__init__()
+
+    def stepForward(self):
+
+        data = next(self._model.forward())
+        self._view.updatePlot(data)
+
+    def stepBackward(self):
+
+        data = next(self._model.backward())
+        self._view.updatePlot(data)
+
+    def load(self):
+
+        initial_condition_file_default = 'testdata_initial'
+        boundary_condition_file_default = 'testdata_boundary'
+
+        initial_condition = np.loadtxt(initial_condition_file_default,
+                                       dtype=np.float_,
+                                       delimiter=',')
+        boundary_condition = np.loadtxt(boundary_condition_file_default,
+                                        dtype=np.bool_,
+                                        delimiter=',')
+        self._model.setInitialCondition(initial_condition=initial_condition,
+                                        boundary_condition=boundary_condition)

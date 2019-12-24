@@ -26,3 +26,7 @@ test_decorators: test_decorator.py decorator.py
 test_model: test_model.py model.py
 	make clean
 	python test_model.py
+
+test_library: test_library.py library.py
+	make clean
+	python test_library.py

@@ -18,116 +18,17 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_plots_and_controls">
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_plots">
+       <layout class="QHBoxLayout" name="horizontalLayout_plots" stretch="2,1">
         <item>
-         <layout class="QGridLayout" name="gridLayout_main_plot">
-          <item row="0" column="0">
-           <spacer name="horizontalSpacer">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>800</width>
-              <height>0</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="1" column="0">
-           <spacer name="verticalSpacer">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>0</width>
-              <height>800</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
+         <layout class="QGridLayout" name="gridLayout_main_plot"/>
         </item>
         <item>
-         <layout class="QVBoxLayout" name="verticalLayout_secondary_plots">
+         <layout class="QVBoxLayout" name="verticalLayout_secondary_plots" stretch="1,1">
           <item>
-           <layout class="QGridLayout" name="gridLayout_difference_plot">
-            <item row="1" column="0">
-             <spacer name="horizontalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>400</width>
-                <height>0</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item row="0" column="0">
-             <spacer name="verticalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>0</width>
-                <height>400</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
+           <layout class="QGridLayout" name="gridLayout_difference_plot"/>
           </item>
           <item>
-           <layout class="QGridLayout" name="gridLayout_residue_plot">
-            <item row="1" column="0">
-             <spacer name="horizontalSpacer_3">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>400</width>
-                <height>0</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item row="0" column="0">
-             <spacer name="verticalSpacer_3">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>0</width>
-                <height>400</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
+           <layout class="QGridLayout" name="gridLayout_residue_plot"/>
           </item>
          </layout>
         </item>
@@ -136,9 +37,9 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_controls">
         <item>
-         <widget class="QPushButton" name="pushButton_4">
+         <widget class="QPushButton" name="pushButton_backward">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="font">
            <font>
@@ -151,7 +52,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_3">
+         <widget class="QPushButton" name="pushButton_start">
           <property name="font">
            <font>
             <pointsize>20</pointsize>
@@ -163,7 +64,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_2">
+         <widget class="QPushButton" name="pushButton_forward">
           <property name="font">
            <font>
             <pointsize>20</pointsize>
@@ -175,7 +76,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="pushButton_reset">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -193,12 +94,37 @@
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="comboBox">
+         <widget class="QComboBox" name="comboBox_speed">
           <property name="font">
            <font>
             <pointsize>20</pointsize>
            </font>
           </property>
+          <item>
+           <property name="text">
+            <string>Real Time</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>1 Step / s</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>5 Steps / s</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>10 Steps / s</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>100 Steps / s</string>
+           </property>
+          </item>
          </widget>
         </item>
        </layout>
@@ -207,8 +133,8 @@
     </item>
     <item>
      <layout class="QGridLayout" name="gridLayout_options">
-      <item row="0" column="0">
-       <spacer name="horizontalSpacer_4">
+      <item row="2" column="0">
+       <spacer name="horizontalSpacer_options">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -222,6 +148,57 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item row="1" column="0">
+       <widget class="QComboBox" name="comboBox_colormap">
+        <item>
+         <property name="text">
+          <string>thermal</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>flame</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>yellowy</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>bipolar</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>spectrum</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>cyclic</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>greyclip</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>grey</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QPushButton" name="pushButton_load">
+        <property name="text">
+         <string>Load Data</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
