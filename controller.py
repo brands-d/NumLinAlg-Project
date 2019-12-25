@@ -49,12 +49,24 @@ class Controller(AbstractController):
 
     def stepForward(self):
 
-        data = next(self._model.forward())
+        stepsize = self._view.speed()
+        stepsize = np.abs(stepsize)
+
+        for _ in range(stepsize):
+
+            data = next(self._model.forward())
+
         self._view.updatePlot(data)
 
     def stepBackward(self):
 
-        data = next(self._model.backward())
+        stepsize = self._view.speed()
+        stepsize = np.abs(stepsize)
+
+        for _ in range(stepsize):
+
+            data = next(self._model.backward())
+
         self._view.updatePlot(data)
 
     def load(self):
@@ -70,3 +82,6 @@ class Controller(AbstractController):
                                         delimiter=',')
         self._model.setInitialCondition(initial_condition=initial_condition,
                                         boundary_condition=boundary_condition)
+
+        data = next(self._model.current())
+        self._view.updatePlot(data)

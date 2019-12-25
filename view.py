@@ -1,6 +1,6 @@
-from PyQt5 import QtWidgets, uic
 import controller
 import pyqtgraph as pg
+from PyQt5 import QtWidgets, uic
 
 
 class AbstractView(QtWidgets.QMainWindow):
@@ -44,6 +44,7 @@ class AbstractView(QtWidgets.QMainWindow):
 class HeatView(AbstractView):
 
     default_ui_file = 'heatWindow.ui'
+    speed_settings = [-1, 1, 5, 10, 100]
 
     def __init__(self, controller, ui_file=None):
 
@@ -60,12 +61,10 @@ class HeatView(AbstractView):
 
         self._main_plot.setImage(data, pos=pos, scale=scale)
 
-    def _changeColorMap(self):
-
-        colormap = self.comboBox_colormap.currentText()
-        self._main_plot.setPredefinedGradient(colormap)
-
     def _initialiseWidgets(self):
+
+        pg.setConfigOption('background', None)
+        pg.setConfigOption('foreground', 'k')
 
         self._main_plot = pg.ImageView(view=pg.PlotItem())
         self._main_plot.view.invertY(False)
@@ -79,3 +78,15 @@ class HeatView(AbstractView):
         self.pushButton_load.clicked.connect(self._controller.load)
         self.comboBox_colormap.currentIndexChanged.connect(
             self._changeColorMap)
+
+    def _changeColorMap(self):
+
+        colormap = self.comboBox_colormap.currentText()
+        self._main_plot.setPredefinedGradient(colormap)
+
+    def speed(self):
+
+        speed_index = self.comboBox_speed.currentIndex()
+        stepsize = HeatView.speed_settings[speed_index]
+
+        return stepsize

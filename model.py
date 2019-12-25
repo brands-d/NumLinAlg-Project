@@ -62,7 +62,7 @@ class AbstractModel():
         if value[edge].all() == True:
 
             self.__boundary = value
-            self.updateA()
+            self._updateA()
 
         else:
 
@@ -80,6 +80,10 @@ class AbstractModel():
 
         self.__initial = value
         self._data = self._initial.copy()
+
+    def current(self):
+
+        yield self._data
 
     def forward(self):
 
@@ -99,8 +103,14 @@ class AbstractModel():
 
             if self._count_iteration > 0:
 
-                self._stepBackward()
-                self._count_iteration -= 1
+                try:
+
+                    self._stepBackward()
+                    self._count_iteration -= 1
+
+                except IndexError:
+
+                    pass
 
                 yield self._data
 
@@ -111,7 +121,7 @@ class AbstractModel():
     def _stepBackward(self):
         pass
 
-    def updateA(self):
+    def _updateA(self):
         pass
 
     def setInitialCondition(self, initial_condition=[], boundary_condition=[]):
@@ -154,7 +164,7 @@ class LaplaceModel(AbstractModel):
 
         super().__init__(controller)
 
-    def updateA(self):
+    def _updateA(self):
 
         size = self._initial.size
         ndim = self._initial.ndim

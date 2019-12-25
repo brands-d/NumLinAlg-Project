@@ -18,6 +18,7 @@ test_all: test_decorator.py decorator.py test_model.py model.py
 	make clean
 	python test_decorator.py
 	python test_model.py
+	python test_library.py
 
 test_decorators: test_decorator.py decorator.py
 	make clean

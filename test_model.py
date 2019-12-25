@@ -108,7 +108,7 @@ class TestLaplaceModel(unittest.TestCase):
 
         self.model = model.LaplaceModel(controller.AbstractController())
 
-    def test_updateA(self):
+    def test__updateA(self):
 
         boundary_condition_1D = np.array([1, 0, 1], dtype=np.bool_)
         boundary_condition_2D = np.array([[1, 1, 1], [1, 0, 1], [1, 1, 1]],
