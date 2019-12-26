@@ -1,7 +1,8 @@
 import model
 import view
 import numpy as np
-import time
+import library
+from threading import Thread
 
 
 class AbstractController():
@@ -45,29 +46,39 @@ class AbstractController():
 
 class Controller(AbstractController):
     def __init__(self):
+
+        self.thread = Thread()
+        self.task = None
+
         super().__init__()
 
     def stepForward(self):
 
         stepsize = self._view.speed()
-        stepsize = np.abs(stepsize)
+
+        if stepsize is None:
+
+            stepsize = 1
 
         for _ in range(stepsize):
 
             data = next(self._model.forward())
 
-        self._view.updatePlot(data)
+        self._view.update_plot(data)
 
     def stepBackward(self):
 
         stepsize = self._view.speed()
-        stepsize = np.abs(stepsize)
+
+        if stepsize is None:
+
+            stepsize = 1
 
         for _ in range(stepsize):
 
             data = next(self._model.backward())
 
-        self._view.updatePlot(data)
+        self._view.update_plot(data)
 
     def load(self):
 
@@ -84,4 +95,25 @@ class Controller(AbstractController):
                                         boundary_condition=boundary_condition)
 
         data = next(self._model.current())
-        self._view.updatePlot(data)
+        self._view.update_plot(data)
+
+    def startStop(self):
+
+        if self.thread.is_alive():
+
+            self.task.terminate()
+            self.thread.join()
+
+        else:
+
+            self.task = library.RunningTask()
+            self.thread = Thread(target=self.task.run,
+                                 args=(self.stepForward, ))
+            self.thread.start()
+
+    def killProcesses(self):
+
+        if self.task is not None:
+
+            self.task.terminate()
+            self.thread.join()

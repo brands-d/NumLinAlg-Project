@@ -17,6 +17,8 @@ def main():
 
     app.exec_()
 
+    controller.killProcesses()
+
 
 if __name__ == "__main__":
     main()

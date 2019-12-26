@@ -1,3 +1,6 @@
+import time
+
+
 class BufferQueue():
     def __init__(self, maxsize=None):
 
@@ -20,6 +23,35 @@ class BufferQueue():
 
         return len(self._list)
 
-    def empty(self):
+    def isempty(self):
 
         return not self._list
+
+    def empty(self):
+
+        self._list = []
+
+
+class RunningTask:
+    def __init__(self):
+
+        self._running = True
+
+    def terminate(self):
+
+        self._running = False
+
+    def run(self, function):
+
+        while self._running:
+
+            start_time = time.time()
+
+            function()
+
+            end_time = time.time()
+            diff_time = end_time - start_time
+
+            if diff_time < 1:
+
+                time.sleep(1 - diff_time)

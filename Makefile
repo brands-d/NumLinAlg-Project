@@ -31,3 +31,6 @@ test_model: test_model.py model.py
 test_library: test_library.py library.py
 	make clean
 	python test_library.py
+
+lint:
+	pylint *.py

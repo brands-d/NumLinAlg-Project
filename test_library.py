@@ -10,14 +10,14 @@ class TestBufferQueue(unittest.TestCase):
 
     def test_bufferQueue(self):
 
-        self.assertEqual(self.queue.empty(), True, 'Not empty.')
+        self.assertEqual(self.queue.isempty(), True, 'Not empty.')
         self.assertRaises(IndexError, self.queue.get)
 
         for element in range(self.maxsize):
 
             self.queue.put(element)
 
-        self.assertEqual(self.queue.empty(), False, 'Empty.')
+        self.assertEqual(self.queue.isempty(), False, 'Empty.')
         self.assertEqual(len(self.queue), self.maxsize, 'Wrong size.')
         self.assertEqual(self.queue.get(), self.maxsize - 1, "Wrong element.")
         self.assertEqual(len(self.queue), self.maxsize - 1, 'Wrong size.')

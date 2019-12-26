@@ -31,7 +31,7 @@ class AbstractView(QtWidgets.QMainWindow):
             raise TypeError(
                 'Needs to be a valid instance of AbstractController.')
 
-    def updatePlot(self, data):
+    def update_plot(self, data):
         pass
 
     def _initialiseWidgets(self):
@@ -44,7 +44,7 @@ class AbstractView(QtWidgets.QMainWindow):
 class HeatView(AbstractView):
 
     default_ui_file = 'heatWindow.ui'
-    speed_settings = [-1, 1, 5, 10, 100]
+    speed_settings = [None, 1, 5, 10, 100]
 
     def __init__(self, controller, ui_file=None):
 
@@ -57,7 +57,7 @@ class HeatView(AbstractView):
 
         self.show()
 
-    def updatePlot(self, data, pos=[0, 0], scale=[1, 1]):
+    def update_plot(self, data, pos=[0, 0], scale=[1, 1]):
 
         self._main_plot.setImage(data, pos=pos, scale=scale)
 
@@ -75,6 +75,7 @@ class HeatView(AbstractView):
 
         self.pushButton_forward.clicked.connect(self._controller.stepForward)
         self.pushButton_backward.clicked.connect(self._controller.stepBackward)
+        self.pushButton_start.clicked.connect(self._controller.startStop)
         self.pushButton_load.clicked.connect(self._controller.load)
         self.comboBox_colormap.currentIndexChanged.connect(
             self._changeColorMap)
