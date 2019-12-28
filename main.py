@@ -12,12 +12,12 @@ def main():
     view = HeatView(controller)
     model = LaplaceModel(controller)
 
-    controller._view = view
-    controller._model = model
+    controller.view = view
+    controller.model = model
 
     app.exec_()
 
-    controller.killProcesses()
+    controller.kill_processes()
 
 
 if __name__ == "__main__":

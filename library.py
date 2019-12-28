@@ -32,7 +32,7 @@ class BufferQueue():
         self._list = []
 
 
-class RunningTask:
+class TimedTask:
     def __init__(self):
 
         self._running = True
@@ -41,17 +41,17 @@ class RunningTask:
 
         self._running = False
 
-    def run(self, function):
+    def run(self, function, desired_run_time=1, *args, **kwargs):
 
         while self._running:
 
             start_time = time.time()
 
-            function()
+            function(*args, **kwargs)
 
             end_time = time.time()
             diff_time = end_time - start_time
 
-            if diff_time < 1:
+            if diff_time < desired_run_time:
 
-                time.sleep(1 - diff_time)
+                time.sleep(desired_run_time - diff_time)

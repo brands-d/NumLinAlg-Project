@@ -13,7 +13,7 @@ import decorator
 import library
 
 
-class AbstractModel(metaclass=ABCMeta):
+class AbstractModel():
     """Abstract class defining basic behaviour of models.
 
     Defines basic beheaviour and interface for all models. Provides simple
@@ -35,6 +35,9 @@ class AbstractModel(metaclass=ABCMeta):
         _data_history: BufferQueue holding the history of the data up to a
             certain maximum (see max_history).
     """
+
+    __metaclass__ = ABCMeta
+
     def __init__(self, controller, max_history):
 
         self.controller = controller
@@ -76,9 +79,7 @@ class AbstractModel(metaclass=ABCMeta):
         self._initial = np.array(value, dtype=np.float_)
 
         # Changing initial condition resets data
-        self.count_iteration = 0
-        self._data = self.initial.copy()
-        self._data_history.empty()
+        self.reset()
 
     @property
     def boundary(self):
@@ -187,6 +188,12 @@ class AbstractModel(metaclass=ABCMeta):
     @abstractmethod
     def _step_forward(self):
         pass
+
+    def reset(self):
+
+        self.count_iteration = 0
+        self._data = self.initial.copy()
+        self._data_history.empty()
 
 
 class LaplaceModel(AbstractModel):
