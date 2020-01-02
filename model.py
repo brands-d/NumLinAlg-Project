@@ -132,7 +132,7 @@ class AbstractModel():
             return an empty numpy arry.
         """
 
-        return self._data
+        return self._data, self._parameters()
 
     def forward(self):
         """Advances the simulations by one step and returns the new data
@@ -152,7 +152,7 @@ class AbstractModel():
             self._step_forward()
             self.count_iteration += 1
 
-            yield self._data
+            yield self._data, self._parameters()
 
     def backward(self):
         """Backtracks the simulations by one step and returns the old data
@@ -171,7 +171,7 @@ class AbstractModel():
 
             try:
 
-                self._data = self._data_history.get()
+                self._data = self._data_history.pop()
                 self.count_iteration -= 1
 
             except IndexError:
@@ -179,7 +179,7 @@ class AbstractModel():
                 # End of history has been reached
                 pass
 
-            yield self._data
+            yield self._data, self._parameters()
 
     @abstractmethod
     def _update_matrix(self):
@@ -194,6 +194,9 @@ class AbstractModel():
         self.count_iteration = 0
         self._data = self.initial.copy()
         self._data_history.empty()
+
+    def _parameters(self):
+        pass
 
 
 class LaplaceModel(AbstractModel):
@@ -263,3 +266,27 @@ class LaplaceModel(AbstractModel):
         data_aux = self._matrix.dot(data_aux)
 
         self._data = np.reshape(data_aux, self._data.shape)
+
+    def _parameters(self):
+
+        try:
+
+            last_data = self._data_history.last()
+
+        except IndexError:
+
+            last_data = self._data.copy()
+
+        mean = np.nanmean(self._data)
+        iter_step = self.count_iteration
+        abs_change = np.nansum(np.abs(self._data - last_data))
+        rel_change = abs_change / (mean * self._data.size)
+
+        parameters = {
+            'Average Temperature': mean,
+            'Iteration Step': iter_step,
+            'Absolute Change': abs_change,
+            'Relative Change': rel_change
+        }
+
+        return parameters

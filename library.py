@@ -15,7 +15,7 @@ class BufferQueue():
 
         self._list.append(item)
 
-    def get(self):
+    def pop(self):
 
         return self._list.pop(-1)
 
@@ -30,6 +30,14 @@ class BufferQueue():
     def empty(self):
 
         self._list = []
+
+    def last(self):
+
+        return self._list[-1]
+
+    def first(self):
+
+        return self._list[0]
 
 
 class TimedTask:

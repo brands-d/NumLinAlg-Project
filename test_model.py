@@ -22,8 +22,8 @@ class TestLaplaceModel(unittest.TestCase):
 
         self.assertEqual((self.model.initial == [1, 0, 0]).all(), True)
 
-        self.assertEqual((self.model.current() == self.model.initial).all(),
-                         True)
+        data, _ = self.model.current()
+        self.assertEqual((data == self.model.initial).all(), True)
 
     def test_property_boundary(self):
 
@@ -57,9 +57,11 @@ class TestLaplaceModel(unittest.TestCase):
 
         self.assertEqual(([1, 0, 1] == self.model.initial).all(), True)
 
-        self.assertEqual((next(fow_iter) == [1, 1, 1]).all(), True)
+        data, _ = next(fow_iter)
+        self.assertEqual((data == [1, 1, 1]).all(), True)
 
-        self.assertEqual((next(fow_iter) == [1, 1, 1]).all(), True)
+        data, _ = next(fow_iter)
+        self.assertEqual((data == [1, 1, 1]).all(), True)
 
     def test_backward(self):
 
@@ -68,10 +70,12 @@ class TestLaplaceModel(unittest.TestCase):
         ba_iter = self.model.backward()
         fow_iter = self.model.forward()
 
-        self.assertEqual((next(ba_iter) == [1, 0, 1]).all(), True)
+        data, _ = next(ba_iter)
+        self.assertEqual((data == [1, 0, 1]).all(), True)
 
         _ = next(fow_iter)
-        self.assertEqual((next(ba_iter) == [1, 0, 1]).all(), True)
+        data, _ = next(ba_iter)
+        self.assertEqual((data == [1, 0, 1]).all(), True)
 
         for _ in range(self.model.max_history):
             _ = next(fow_iter)
@@ -79,7 +83,7 @@ class TestLaplaceModel(unittest.TestCase):
         for _ in range(self.model.max_history):
             _ = next(ba_iter)
 
-        data = self.model.current()
+        data, _ = self.model.current()
         self.assertEqual((data == [1, 0, 1]).all(), True)
 
         for _ in range(self.model.max_history + 1):
@@ -88,7 +92,7 @@ class TestLaplaceModel(unittest.TestCase):
         for _ in range(self.model.max_history + 1):
             _ = next(ba_iter)
 
-        data = self.model.current()
+        data, _ = self.model.current()
         self.assertEqual((data == [1, 1, 1]).all(), True)
 
     def test_matrix(self):

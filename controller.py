@@ -71,7 +71,7 @@ class Controller(AbstractController):
     def stepping(self):
 
         stepsize = self.view.speed()
-        sender = self.view.sender().objectName()
+        sender = self.view.sender()
 
         if stepsize == np.inf:
 
@@ -90,17 +90,17 @@ class Controller(AbstractController):
 
         for _ in range(stepsize):
 
-            data = next(self._forward_gen)
+            data, parameters = next(self._forward_gen)
 
-        self.view.update_plot(data)
+        self.view.update(data, parameters)
 
     def _step_backward(self, stepsize=1):
 
         for _ in range(stepsize):
 
-            data = next(self._backward_gen)
+            data, parameters = next(self._backward_gen)
 
-        self.view.update_plot(data)
+        self.view.update(data, parameters, add_data=False)
 
     def load(self):
 
@@ -119,8 +119,9 @@ class Controller(AbstractController):
         self._forward_gen = self.model.forward()
         self._backward_gen = self.model.backward()
 
-        data = self.model.current()
-        self.view.update_plot(data)
+        data, parameters = self.model.current()
+
+        self.view.update(data, parameters)
 
     def play(self):
 
@@ -128,6 +129,8 @@ class Controller(AbstractController):
 
             self.task.terminate()
             self.thread.join()
+
+            self.view.gui_list['Play Button'].setText('Start')
 
         else:
 
@@ -143,6 +146,8 @@ class Controller(AbstractController):
                                  ))
             self.thread.start()
 
+            self.view.gui_list['Play Button'].setText('Stop')
+
     def kill_processes(self):
 
         if self.task is not None:
@@ -153,9 +158,11 @@ class Controller(AbstractController):
     def reset(self):
 
         self.model.reset()
-        data = self.model.current()
+        self.view.reset()
 
-        self.view.update_plot(data)
+        data, parameters = self.model.current()
+
+        self.view.update(data, parameters)
 
     def speed_changed(self):
 

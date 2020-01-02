@@ -11,7 +11,7 @@ class TestBufferQueue(unittest.TestCase):
     def test_bufferQueue(self):
 
         self.assertEqual(self.queue.isempty(), True, 'Not empty.')
-        self.assertRaises(IndexError, self.queue.get)
+        self.assertRaises(IndexError, self.queue.pop)
 
         for element in range(self.maxsize):
 
@@ -19,14 +19,14 @@ class TestBufferQueue(unittest.TestCase):
 
         self.assertEqual(self.queue.isempty(), False, 'Empty.')
         self.assertEqual(len(self.queue), self.maxsize, 'Wrong size.')
-        self.assertEqual(self.queue.get(), self.maxsize - 1, "Wrong element.")
+        self.assertEqual(self.queue.pop(), self.maxsize - 1, "Wrong element.")
         self.assertEqual(len(self.queue), self.maxsize - 1, 'Wrong size.')
 
         self.queue.put(self.maxsize - 1)
         self.queue.put(self.maxsize)
 
         self.assertEqual(len(self.queue), self.maxsize, 'Wrong size.')
-        self.assertEqual(self.queue.get(), self.maxsize, "Wrong element.")
+        self.assertEqual(self.queue.pop(), self.maxsize, "Wrong element.")
         self.assertEqual(len(self.queue), self.maxsize - 1, 'Wrong size.')
 
     def tearDown(self):
