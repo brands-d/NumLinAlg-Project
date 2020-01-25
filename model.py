@@ -261,7 +261,6 @@ class LaplaceModel(AbstractModel):
             This method is for internal use only. Please use forward()
             instead.
         """
-
         data_aux = self._data.flatten()
         data_aux = self._matrix.dot(data_aux)
 
@@ -290,3 +289,28 @@ class LaplaceModel(AbstractModel):
         }
 
         return parameters
+
+
+class LorenzModel(AbstractModel):
+    def __init__(self, controller, max_history=100):
+
+        super().__init__(controller, max_history)
+        self.dt = 0
+
+    def _update_matrix(self, param=[0, 0, 0, 0]):
+
+        self.dt, sigma, rho, beta = param
+        self._matrix = np.array([[1 - self.dt * sigma, sigma * self.dt, 0],
+                                 [self.dt * rho, 1 - self.dt, 0],
+                                 [0, 0, 1 - self.dt * beta]])
+
+    @decorator.logThis(filename=None)
+    def _step_forward(self):
+
+        self._matrix[1, 2] = -self.dt * self._data[0]
+        self._matrix[2, 0] = self.dt * self._data[1]
+        self._data = self._matrix.dot(self._data)
+
+    def _parameters(self):
+
+        return None

@@ -102,17 +102,12 @@ class Controller(AbstractController):
 
         self.view.update(data, parameters, add_data=False)
 
-    def load(self):
+    def load(self,
+             initial_data_path='testdata_initial',
+             boundary_condition_path='testdata_boundary'):
 
-        initial_condition_file_default = 'testdata_initial'
-        boundary_condition_file_default = 'testdata_boundary'
-
-        initial_condition = np.loadtxt(initial_condition_file_default,
-                                       dtype=np.float_,
-                                       delimiter=',')
-        boundary_condition = np.loadtxt(boundary_condition_file_default,
-                                        dtype=np.bool_,
-                                        delimiter=',')
+        initial_condition = np.load(initial_data_path)
+        boundary_condition = np.load(boundary_condition_path)
         self.model.initial = initial_condition
         self.model.boundary = boundary_condition
 

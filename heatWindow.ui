@@ -50,14 +50,14 @@
        </spacer>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_plots" stretch="5,4">
+       <layout class="QHBoxLayout" name="horizontalLayout_plots" stretch="2,1">
         <item>
          <layout class="QGridLayout" name="gridLayout_main_plot"/>
         </item>
         <item>
-         <layout class="QVBoxLayout" name="verticalLayout_secondary_plots" stretch="0,0,1">
+         <layout class="QVBoxLayout" name="verticalLayout_secondary_plots" stretch="1,0,2">
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout">
+           <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
             <item>
              <widget class="QPushButton" name="pushButton_load">
               <property name="sizePolicy">
@@ -79,7 +79,7 @@
              </widget>
             </item>
             <item>
-             <layout class="QVBoxLayout" name="verticalLayout_parameters">
+             <layout class="QVBoxLayout" name="verticalLayout_parameters" stretch="0,1">
               <item>
                <widget class="QLabel" name="label_parameters">
                 <property name="sizePolicy">
@@ -375,17 +375,22 @@
           </item>
           <item>
            <property name="text">
+            <string>5 Steps / s</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
             <string>10 Steps / s</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>50 Steps / s</string>
+            <string>25 Steps / s</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>100 Steps / s</string>
+            <string>50 Steps / s</string>
            </property>
           </item>
           <item>

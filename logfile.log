@@ -1,0 +1,19 @@
+INFO:OpenGL.acceleratesupport:No OpenGL_accelerate module loaded: No module named 'OpenGL_accelerate'
+INFO:logfile.log:_step_forward ran in 0.0115 seconds with args: (<model.LaplaceModel object at 0x7f375263ffd0>,), and kwargs: {}
+INFO:logfile.log:_step_forward ran in 0.0144 seconds with args: (<model.LaplaceModel object at 0x7f375263ffd0>,), and kwargs: {}
+INFO:logfile.log:_step_forward ran in 0.0123 seconds with args: (<model.LaplaceModel object at 0x7f375263ffd0>,), and kwargs: {}
+INFO:logfile.log:_step_forward ran in 0.0148 seconds with args: (<model.LaplaceModel object at 0x7f375263ffd0>,), and kwargs: {}
+INFO:logfile.log:_step_forward ran in 0.0293 seconds with args: (<model.LaplaceModel object at 0x7f375263ffd0>,), and kwargs: {}
+INFO:logfile.log:_step_forward ran in 0.0122 seconds with args: (<model.LaplaceModel object at 0x7f375263ffd0>,), and kwargs: {}
+INFO:logfile.log:_step_forward ran in 0.0134 seconds with args: (<model.LaplaceModel object at 0x7f375263ffd0>,), and kwargs: {}
+INFO:logfile.log:_step_forward ran in 0.0143 seconds with args: (<model.LaplaceModel object at 0x7f375263ffd0>,), and kwargs: {}
+INFO:logfile.log:_step_forward ran in 0.0119 seconds with args: (<model.LaplaceModel object at 0x7f375263ffd0>,), and kwargs: {}
+INFO:logfile.log:_step_forward ran in 0.0289 seconds with args: (<model.LaplaceModel object at 0x7f375263ffd0>,), and kwargs: {}
+INFO:logfile.log:_step_forward ran in 0.0088 seconds with args: (<model.LaplaceModel object at 0x7f375263ffd0>,), and kwargs: {}
+INFO:logfile.log:_step_forward ran in 0.0082 seconds with args: (<model.LaplaceModel object at 0x7f375263ffd0>,), and kwargs: {}
+INFO:logfile.log:_step_forward ran in 0.0102 seconds with args: (<model.LaplaceModel object at 0x7f375263ffd0>,), and kwargs: {}
+INFO:logfile.log:_step_forward ran in 0.0084 seconds with args: (<model.LaplaceModel object at 0x7f375263ffd0>,), and kwargs: {}
+INFO:logfile.log:_step_forward ran in 0.0106 seconds with args: (<model.LaplaceModel object at 0x7f375263ffd0>,), and kwargs: {}
+INFO:logfile.log:_step_forward ran in 0.0081 seconds with args: (<model.LaplaceModel object at 0x7f375263ffd0>,), and kwargs: {}
+INFO:logfile.log:_step_forward ran in 0.0082 seconds with args: (<model.LaplaceModel object at 0x7f375263ffd0>,), and kwargs: {}
+INFO:logfile.log:_step_forward ran in 0.0083 seconds with args: (<model.LaplaceModel object at 0x7f375263ffd0>,), and kwargs: {}

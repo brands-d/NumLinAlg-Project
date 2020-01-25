@@ -10,7 +10,11 @@ from abc import ABCMeta, abstractmethod
 import controller
 import numpy as np
 import pyqtgraph as pg
+import matplotlib_window
 from PyQt5 import QtWidgets, uic
+from pyqtgraph.Qt import QtCore, QtGui
+from PyQt5.QtWidgets import QFileDialog
+import pyqtgraph.opengl as gl
 
 
 class AbstractView(QtWidgets.QMainWindow):
@@ -27,6 +31,23 @@ class AbstractView(QtWidgets.QMainWindow):
 
         self._initialise_widgets()
         self._setup_connections()
+
+    def load(self):
+
+        # Loading initial data
+        initial_data_path, _ = QFileDialog.getOpenFileName(
+            None, 'Open initial data file', '', 'All Files (*)')
+
+        # Loading boundary data
+        boundary_data_path, _ = QFileDialog.getOpenFileName(
+            None, 'Open boundary data file', '', 'All Files (*)')
+
+        if initial_data_path != '' and boundary_data_path != '':
+
+            self.controller.load(initial_data_path, boundary_data_path)
+
+        else:
+            pass
 
     @property
     def controller(self):
@@ -73,7 +94,7 @@ class AbstractView(QtWidgets.QMainWindow):
 class HeatView(AbstractView):
 
     default_ui_file = 'heatWindow.ui'
-    speed_settings = [1, 10, 50, 100, np.inf]
+    speed_settings = [1, 5, 10, 25, 50, np.inf]
 
     def __init__(self, controller, ui_file=None):
 
@@ -92,22 +113,13 @@ class HeatView(AbstractView):
 
         self.show()
 
-    def _update_plot(self, data):
-
-        self._main_plot.setImage(data, pos=[0, 0], scale=[1, 1])
-
     def _initialise_widgets(self):
+
+        self._main_plot = matplotlib_window.MyDynamicMplCanvas(dpi=100)
+        self.gridLayout_main_plot.addWidget(self._main_plot)
 
         pg.setConfigOption('background', None)
         pg.setConfigOption('foreground', 'k')
-
-        self._main_plot = pg.ImageView(view=pg.PlotItem())
-        self._main_plot.view.invertY(False)
-        self._main_plot.setPredefinedGradient('thermal')
-        self._main_plot.ui.histogram.hide()
-        self._main_plot.ui.roiBtn.hide()
-        self._main_plot.ui.menuBtn.hide()
-        self.gridLayout_main_plot.addWidget(self._main_plot)
 
         self._residue_plot = pg.PlotWidget()
         self._residue_plot.addItem(pg.PlotCurveItem())
@@ -121,16 +133,9 @@ class HeatView(AbstractView):
         self.pushButton_backward.clicked.connect(self.controller.stepping)
         self.pushButton_start.clicked.connect(self.controller.play)
         self.pushButton_reset.clicked.connect(self.controller.reset)
-        self.pushButton_load.clicked.connect(self.controller.load)
+        self.pushButton_load.clicked.connect(self.load)
         self.comboBox_speed.currentIndexChanged.connect(
             self.controller.speed_changed)
-
-    def speed(self):
-
-        speed_index = self.comboBox_speed.currentIndex()
-        stepsize = HeatView.speed_settings[speed_index]
-
-        return stepsize
 
     def _update_parameters(self, param):
 
@@ -142,14 +147,6 @@ class HeatView(AbstractView):
             param['Absolute Change']))
         self.label_rel_change_value.setText('{0:.3f}'.format(
             param['Relative Change']))
-
-    def update(self, data, param, add_data=True):
-
-        self._update_parameters(param)
-        self._update_plot(data)
-        self._update_residue(
-            (param['Iteration Step'], param['Relative Change']),
-            add_data=add_data)
 
     def _update_residue(self, data, add_data):
 
@@ -170,7 +167,73 @@ class HeatView(AbstractView):
                      y=new_data[1],
                      pen=pg.mkPen(color='r', width=3))
 
+    def update(self, data, param, add_data=True):
+
+        self._update_parameters(param)
+        self._main_plot.update_plot(data)
+        self._update_residue(
+            (param['Iteration Step'], param['Relative Change']),
+            add_data=add_data)
+
     def reset(self):
 
         self._residue_plot.getPlotItem().clear()
         self._residue_plot.addItem(pg.PlotCurveItem())
+
+    def speed(self):
+
+        speed_index = self.comboBox_speed.currentIndex()
+        stepsize = HeatView.speed_settings[speed_index]
+
+        return stepsize
+
+
+class LorenzView(AbstractView):
+
+    default_ui_file = 'lorenzWindow.ui'
+    speed_settings = [1, 5, 10, 25, 50, np.inf]
+
+    def __init__(self, controller, ui_file=None):
+
+        self._main_plot = None
+
+        filename = ui_file if ui_file else LorenzView.default_ui_file
+        super().__init__(controller, filename)
+
+        self.gui_list = {
+            'Forward Step': self.pushButton_forward,
+            'Backward Step': self.pushButton_backward,
+            'Play Button': self.pushButton_start
+        }
+
+        self.show()
+
+    def _initialise_widgets(self):
+
+        pg.setConfigOption('background', None)
+        pg.setConfigOption('foreground', 'k')
+
+        self._main_plot = pg.PlotWidget()
+        self._main_plot.addItem(pg.PlotCurveItem())
+        self.gridLayout_main_plot.addWidget(self._main_plot)
+
+    def _setup_connections(self):
+
+        self.pushButton_forward.clicked.connect(self.controller.stepping)
+        self.pushButton_backward.clicked.connect(self.controller.stepping)
+        self.pushButton_start.clicked.connect(self.controller.play)
+        self.pushButton_reset.clicked.connect(self.controller.reset)
+        self.pushButton_load.clicked.connect(self.load)
+        self.comboBox_speed.currentIndexChanged.connect(
+            self.controller.speed_changed)
+
+    def update(self, data, param=None, add_data=True):
+
+        self._main_plot.update_plot(data)
+
+    def speed(self):
+
+        speed_index = self.comboBox_speed.currentIndex()
+        stepsize = LorenzView.speed_settings[speed_index]
+
+        return stepsize
