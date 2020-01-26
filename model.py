@@ -47,7 +47,6 @@ class AbstractModel():
         self._data = np.array([], dtype=np.float_)
         self._data_history = library.BufferQueue(maxsize=self.max_history)
         self.initial = np.array([], dtype=np.float_)
-        self.boundary = np.array([], dtype=np.bool_)
 
     @property
     def controller(self):
@@ -80,44 +79,6 @@ class AbstractModel():
 
         # Changing initial condition resets data
         self.reset()
-
-    @property
-    def boundary(self):
-        """numpy array (bool_): Needs to be same size as initial condition
-        and designates which positions are boundaries (= True) and which are
-        not (= False). Boundaries to not change during iterations. Outer edge
-        in each dimensions needs to be defined as boundary."""
-
-        return self._boundary
-
-    @boundary.setter
-    def boundary(self, value):
-
-        value = np.array(value, dtype=np.bool_)
-
-        if value.shape != self.initial.shape:
-
-            raise TypeError(
-                "Boundary condition needs to have the same size as initial "
-                "condition. ({} != {})".format(value.shape,
-                                               self.initial.shape))
-
-        # Testing whether the edge is defined as boundary. Necessary for
-        # iteration method to work.
-        # Mask for the edge
-        edge = np.ones(value.shape, dtype=np.bool_)
-        # Slice in arbitrary dimensions for inner part
-        index = (slice(1, -1), ) * value.ndim
-        edge[index] = False
-
-        if value[edge].all():
-
-            self._boundary = value
-            self._update_matrix()
-
-        else:
-
-            raise TypeError('Edge needs to be defined as such.')
 
     def current(self):
         """Returns the current state of data.
@@ -181,6 +142,12 @@ class AbstractModel():
 
             yield self._data, self._parameters()
 
+    def reset(self):
+
+        self.count_iteration = 0
+        self._data = self.initial.copy()
+        self._data_history.empty()
+
     @abstractmethod
     def _update_matrix(self):
         pass
@@ -189,12 +156,7 @@ class AbstractModel():
     def _step_forward(self):
         pass
 
-    def reset(self):
-
-        self.count_iteration = 0
-        self._data = self.initial.copy()
-        self._data_history.empty()
-
+    @abstractmethod
     def _parameters(self):
         pass
 
@@ -213,6 +175,45 @@ class LaplaceModel(AbstractModel):
     def __init__(self, controller, max_history=100):
 
         super().__init__(controller, max_history)
+        self.boundary = np.array([], dtype=np.bool_)
+
+    @property
+    def boundary(self):
+        """numpy array (bool_): Needs to be same size as initial condition
+        and designates which positions are boundaries (= True) and which are
+        not (= False). Boundaries to not change during iterations. Outer edge
+        in each dimensions needs to be defined as boundary."""
+
+        return self._boundary
+
+    @boundary.setter
+    def boundary(self, value):
+
+        value = np.array(value, dtype=np.bool_)
+
+        if value.shape != self.initial.shape:
+
+            raise TypeError(
+                "Boundary condition needs to have the same size as initial "
+                "condition. ({} != {})".format(value.shape,
+                                               self.initial.shape))
+
+        # Testing whether the edge is defined as boundary. Necessary for
+        # iteration method to work.
+        # Mask for the edge
+        edge = np.ones(value.shape, dtype=np.bool_)
+        # Slice in arbitrary dimensions for inner part
+        index = (slice(1, -1), ) * value.ndim
+        edge[index] = False
+
+        if value[edge].all():
+
+            self._boundary = value
+            self._update_matrix()
+
+        else:
+
+            raise TypeError('Edge needs to be defined as such.')
 
     def _update_matrix(self):
         """Updates the matrix A defining the the problem and used for solving
@@ -292,25 +293,31 @@ class LaplaceModel(AbstractModel):
 
 
 class LorenzModel(AbstractModel):
-    def __init__(self, controller, max_history=100):
+    def __init__(self, controller, max_history=10000):
 
         super().__init__(controller, max_history)
-        self.dt = 0
+        self.sys_params = {'timeStep': 0, 'sigma': 0, 'rho': 0, 'beta': 0}
 
-    def _update_matrix(self, param=[0, 0, 0, 0]):
+    def _update_matrix(self, timeStep=0, sigma=0, rho=0, beta=0):
 
-        self.dt, sigma, rho, beta = param
-        self._matrix = np.array([[1 - self.dt * sigma, sigma * self.dt, 0],
-                                 [self.dt * rho, 1 - self.dt, 0],
-                                 [0, 0, 1 - self.dt * beta]])
+        self.sys_params.update({
+            'timeStep': timeStep,
+            'sigma': sigma,
+            'rho': rho,
+            'beta': rho
+        })
+
+        self._matrix = np.array([[1 - timeStep * sigma, sigma * timeStep, 0],
+                                 [timeStep * rho, 1 - timeStep, 0],
+                                 [0, 0, 1 - timeStep * beta]])
 
     @decorator.logThis(filename=None)
     def _step_forward(self):
 
-        self._matrix[1, 2] = -self.dt * self._data[0]
-        self._matrix[2, 0] = self.dt * self._data[1]
+        self._matrix[1, 2] = -self.sys_params['timeStep'] * self._data[0]
+        self._matrix[2, 0] = self.sys_params['timeStep'] * self._data[1]
         self._data = self._matrix.dot(self._data)
 
     def _parameters(self):
 
-        return None
+        return self.sys_params

@@ -213,9 +213,10 @@ class LorenzView(AbstractView):
         pg.setConfigOption('background', None)
         pg.setConfigOption('foreground', 'k')
 
-        self._main_plot = pg.PlotWidget()
-        self._main_plot.addItem(pg.PlotCurveItem())
-        self.gridLayout_main_plot.addWidget(self._main_plot)
+        self._main_plot = gl.GLLinePlotItem()
+        view_widget = gl.GLViewWidget()
+        view_widget.addItem(self._main_plot)
+        self.gridLayout_main_plot.addWidget(view_widget)
 
     def _setup_connections(self):
 
@@ -227,9 +228,15 @@ class LorenzView(AbstractView):
         self.comboBox_speed.currentIndexChanged.connect(
             self.controller.speed_changed)
 
-    def update(self, data, param=None, add_data=True):
+    def update(self, data, add_data=True):
 
-        self._main_plot.update_plot(data)
+        pos = self._main_plot.pos
+        data = np.array(data)
+
+        if pos is not None:
+            data = np.vstack((pos, data))
+
+        self._main_plot.setData(pos=data)
 
     def speed(self):
 
@@ -237,3 +244,16 @@ class LorenzView(AbstractView):
         stepsize = LorenzView.speed_settings[speed_index]
 
         return stepsize
+
+    def load(self):
+
+        # Loading initial data
+        initial_data_path, _ = QFileDialog.getOpenFileName(
+            None, 'Open initial data file', '', 'All Files (*)')
+
+        if initial_data_path != '':
+
+            self.controller.load(initial_data_path)
+
+        else:
+            pass
