@@ -24,7 +24,6 @@ class AbstractView(QtWidgets.QMainWindow):
     def __init__(self, controller, ui_file):
 
         self.controller = controller
-        self.gui_list = {}
 
         super(AbstractView, self).__init__()
         uic.loadUi(ui_file, self)
@@ -32,19 +31,17 @@ class AbstractView(QtWidgets.QMainWindow):
         self._initialise_widgets()
         self._setup_connections()
 
+        self.show()
+
     def load(self):
 
         # Loading initial data
         initial_data_path, _ = QFileDialog.getOpenFileName(
             None, 'Open initial data file', '', 'All Files (*)')
 
-        # Loading boundary data
-        boundary_data_path, _ = QFileDialog.getOpenFileName(
-            None, 'Open boundary data file', '', 'All Files (*)')
+        if initial_data_path != '':
 
-        if initial_data_path != '' and boundary_data_path != '':
-
-            self.controller.load(initial_data_path, boundary_data_path)
+            self.controller.load(initial_data_path)
 
         else:
             pass
@@ -67,19 +64,11 @@ class AbstractView(QtWidgets.QMainWindow):
                 'Needs to be a valid instance of AbstractController.')
 
     @abstractmethod
-    def update_plot(self, data):
-        pass
-
-    @abstractmethod
     def _initialise_widgets(self):
         pass
 
     @abstractmethod
     def _setup_connections(self):
-        pass
-
-    @abstractmethod
-    def update_parameters(self, param):
         pass
 
     @abstractmethod
@@ -90,10 +79,17 @@ class AbstractView(QtWidgets.QMainWindow):
     def reset():
         pass
 
+    def speed(self):
+
+        speed_index = self.comboBox_speed.currentIndex()
+        stepsize = type(self).speed_settings[speed_index]
+
+        return stepsize
+
 
 class HeatView(AbstractView):
 
-    default_ui_file = 'heatWindow.ui'
+    default_ui_file = 'gui/heatWindow.ui'
     speed_settings = [1, 5, 10, 25, 50, np.inf]
 
     def __init__(self, controller, ui_file=None):
@@ -102,7 +98,7 @@ class HeatView(AbstractView):
         self._difference_plot = None
         self._residue_plot = None
 
-        filename = ui_file if ui_file else HeatView.default_ui_file
+        filename = ui_file if ui_file else type(self).default_ui_file
         super().__init__(controller, filename)
 
         self.gui_list = {
@@ -110,8 +106,6 @@ class HeatView(AbstractView):
             'Backward Step': self.pushButton_backward,
             'Play Button': self.pushButton_start
         }
-
-        self.show()
 
     def _initialise_widgets(self):
 
@@ -175,29 +169,39 @@ class HeatView(AbstractView):
             (param['Iteration Step'], param['Relative Change']),
             add_data=add_data)
 
+    def load(self):
+
+        # Loading initial data
+        initial_data_path, _ = QFileDialog.getOpenFileName(
+            None, 'Open initial data file', '', 'All Files (*)')
+
+        # Loading boundary data
+        boundary_data_path, _ = QFileDialog.getOpenFileName(
+            None, 'Open boundary data file', '', 'All Files (*)')
+
+        if initial_data_path != '' and boundary_data_path != '':
+
+            self.controller.load(initial_data_path, boundary_data_path)
+
+        else:
+            pass
+
     def reset(self):
 
         self._residue_plot.getPlotItem().clear()
         self._residue_plot.addItem(pg.PlotCurveItem())
 
-    def speed(self):
-
-        speed_index = self.comboBox_speed.currentIndex()
-        stepsize = HeatView.speed_settings[speed_index]
-
-        return stepsize
-
 
 class LorenzView(AbstractView):
 
-    default_ui_file = 'lorenzWindow.ui'
-    speed_settings = [1, 5, 10, 25, 50, np.inf]
+    default_ui_file = 'gui/lorenzWindow.ui'
+    speed_settings = [1, 10, 50, 100, 500, np.inf]
 
     def __init__(self, controller, ui_file=None):
 
         self._main_plot = None
 
-        filename = ui_file if ui_file else LorenzView.default_ui_file
+        filename = ui_file if ui_file else type(self).default_ui_file
         super().__init__(controller, filename)
 
         self.gui_list = {
@@ -205,8 +209,6 @@ class LorenzView(AbstractView):
             'Backward Step': self.pushButton_backward,
             'Play Button': self.pushButton_start
         }
-
-        self.show()
 
     def _initialise_widgets(self):
 
@@ -238,22 +240,76 @@ class LorenzView(AbstractView):
 
         self._main_plot.setData(pos=data)
 
-    def speed(self):
+    def reset(self):
+        pass
 
-        speed_index = self.comboBox_speed.currentIndex()
-        stepsize = LorenzView.speed_settings[speed_index]
 
-        return stepsize
+class ThreeBodyView(AbstractView):
 
-    def load(self):
+    default_ui_file = 'gui/threeBodyWindow.ui'
+    speed_settings = [1, 10, 50, 100, 500, np.inf]
 
-        # Loading initial data
-        initial_data_path, _ = QFileDialog.getOpenFileName(
-            None, 'Open initial data file', '', 'All Files (*)')
+    def __init__(self, controller, ui_file=None):
 
-        if initial_data_path != '':
+        self._main_plot = None
 
-            self.controller.load(initial_data_path)
+        filename = ui_file if ui_file else type(self).default_ui_file
+        super().__init__(controller, filename)
 
+        self.gui_list = {
+            'Forward Step': self.pushButton_forward,
+            'Backward Step': self.pushButton_backward,
+            'Play Button': self.pushButton_start
+        }
+
+    def _initialise_widgets(self):
+
+        pg.setConfigOption('background', None)
+        pg.setConfigOption('foreground', 'k')
+
+        self._main_plot_1 = gl.GLLinePlotItem()
+        self._main_plot_2 = gl.GLLinePlotItem()
+        self._main_plot_3 = gl.GLLinePlotItem()
+        view_widget = gl.GLViewWidget()
+        view_widget.addItem(self._main_plot_1)
+        view_widget.addItem(self._main_plot_2)
+        view_widget.addItem(self._main_plot_3)
+        self.gridLayout_main_plot.addWidget(view_widget)
+
+    def _setup_connections(self):
+
+        self.pushButton_forward.clicked.connect(self.controller.stepping)
+        self.pushButton_backward.clicked.connect(self.controller.stepping)
+        self.pushButton_start.clicked.connect(self.controller.play)
+        self.pushButton_reset.clicked.connect(self.controller.reset)
+        self.pushButton_load.clicked.connect(self.load)
+        self.comboBox_speed.currentIndexChanged.connect(
+            self.controller.speed_changed)
+
+    def update(self, data, add_data=True):
+
+        pos_1 = self._main_plot_1.pos
+        pos_2 = self._main_plot_2.pos
+        pos_3 = self._main_plot_3.pos
+        data = np.array(data)
+        planet_1 = data[0:3]
+        planet_2 = data[3:6]
+        planet_3 = data[6:9]
+
+        if pos_1 is not None:
+            self._main_plot_1.setData(pos=np.vstack((pos_1, planet_1)),
+                                      mode='line_strip',
+                                      width=3)
+            self._main_plot_2.setData(pos=np.vstack((pos_2, planet_2)),
+                                      mode='line_strip',
+                                      width=3)
+            self._main_plot_3.setData(pos=np.vstack((pos_3, planet_3)),
+                                      mode='line_strip',
+                                      width=3)
         else:
-            pass
+            self._main_plot_1.setData(pos=planet_1, mode='line_strip', width=3)
+            self._main_plot_2.setData(pos=planet_2, mode='line_strip', width=3)
+            self._main_plot_3.setData(pos=planet_3, mode='line_strip', width=3)
+
+    def reset(self):
+        pass

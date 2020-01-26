@@ -321,3 +321,65 @@ class LorenzModel(AbstractModel):
     def _parameters(self):
 
         return self.sys_params
+
+
+class ThreeBodyModel(AbstractModel):
+    def __init__(self, controller, max_history=10000):
+
+        super().__init__(controller, max_history)
+        self.sys_params = {'timeStep': 0, 'G': 0, 'm_1': 0, 'm_2': 0, 'm_3': 0}
+
+    def _update_matrix(self, timeStep=0, G=0, m_1=0, m_2=0, m_3=0):
+
+        self.sys_params.update({
+            'timeStep': timeStep,
+            'G': G,
+            'm_1': m_1,
+            'm_2': m_2,
+            'm_3': m_3
+        })
+
+        self._matrix = np.eye(18)
+
+        self._matrix[0, 9] = timeStep / m_1
+        self._matrix[1, 10] = timeStep / m_1
+        self._matrix[2, 11] = timeStep / m_1
+        self._matrix[3, 12] = timeStep / m_2
+        self._matrix[4, 13] = timeStep / m_2
+        self._matrix[5, 14] = timeStep / m_2
+        self._matrix[6, 15] = timeStep / m_3
+        self._matrix[7, 16] = timeStep / m_3
+        self._matrix[8, 17] = timeStep / m_3
+
+    @decorator.logThis(filename=None)
+    def _step_forward(self):
+
+        f = self.sys_params['G'] * self.sys_params['timeStep']
+        m_1 = self.sys_params['m_1']
+        m_2 = self.sys_params['m_2']
+        m_3 = self.sys_params['m_3']
+        data, _ = self.current()
+        r_12 = np.abs(np.linalg.norm(data[0:3] - data[3:6]))**3
+        r_13 = np.abs(np.linalg.norm(data[0:3] - data[6:9]))**3
+        r_23 = np.abs(np.linalg.norm(data[3:6] - data[6:9]))**3
+
+        for i, row in enumerate(self._matrix[9:12]):
+            row[i] = -f * (m_2 / r_12 + m_3 / r_13)
+            row[i + 3] = f * m_2 / r_12
+            row[i + 6] = f * m_3 / r_13
+
+        for i, row in enumerate(self._matrix[12:15]):
+            row[i] = f * m_1 / r_12
+            row[i + 3] = -f * (m_1 / r_12 + m_3 / r_23)
+            row[i + 6] = f * m_3 / r_23
+
+        for i, row in enumerate(self._matrix[15:18]):
+            row[i] = f * m_1 / r_13
+            row[i + 3] = f * m_2 / r_23
+            row[i + 6] = -f * (m_1 / r_13 + m_2 / r_23)
+
+        self._data = self._matrix.dot(self._data)
+
+    def _parameters(self):
+
+        return self.sys_params

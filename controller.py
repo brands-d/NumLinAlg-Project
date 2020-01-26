@@ -183,3 +183,22 @@ class LorenzController(Controller):
         data, parameters = self.model.current()
 
         self.view.update(data)
+
+
+class ThreeBodyController(Controller):
+    def load(self, initial_data_path='testdata_initial'):
+
+        data = np.load(initial_data_path, allow_pickle=True)
+        
+        self.model.initial = data.item().get('initialPosition')
+
+        del data.item()['initialPosition']
+
+        self.model._update_matrix(**data.item())
+
+        self._forward_gen = self.model.forward()
+        self._backward_gen = self.model.backward()
+
+        data, parameters = self.model.current()
+
+        self.view.update(data)

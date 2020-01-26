@@ -1,9 +1,9 @@
 import sys
 
 from PyQt5 import QtWidgets, uic
-from view import HeatView, LorenzView
+from view import HeatView, LorenzView, ThreeBodyView
 from controller import Controller, LorenzController
-from model import LaplaceModel, LorenzModel
+from model import LaplaceModel, LorenzModel, ThreeBodyModel
 
 
 def main():
@@ -23,6 +23,12 @@ def main():
         controller = LorenzController()
         view = LorenzView(controller)
         model = LorenzModel(controller)
+
+    elif program_type == 'three':
+
+        controller = LorenzController()
+        view = ThreeBodyView(controller)
+        model = ThreeBodyModel(controller)
 
     else:
 
